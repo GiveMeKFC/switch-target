@@ -12,6 +12,38 @@ def callback(x):
     pass
 
 
+def rectangle_recognition():
+
+    if contours is not None:
+        for cnt in contours:
+            if len(cnt) > 3:
+
+                rect = cv2.minAreaRect(cnt)
+                rect_area = rect[1][0]*rect[1][1]
+
+                area = cv2.contourArea(cnt)
+
+                ratio = area/rect_area
+
+                if 0.85 < ratio < 1.15 and area > 150:
+
+                    box = cv2.boxPoints(rect)
+                    box = np.int0(box)
+                    cv2.drawContours(original, [box], 0, (0, 0, 255), 2)
+
+
+
+def get_trackbars_position():
+
+    hsv['ilowH'] = cv2.getTrackbarPos('lowH', 'image')
+    hsv['ihighH'] = cv2.getTrackbarPos('highH', 'image')
+    hsv['ilowS'] = cv2.getTrackbarPos('lowS', 'image')
+    hsv['ihighS'] = cv2.getTrackbarPos('highS', 'image')
+    hsv['ilowV'] = cv2.getTrackbarPos('lowV', 'image')
+    hsv['ihighV'] = cv2.getTrackbarPos('highV', 'image')
+
+
+
 # create trackbars for color change
 cv2.createTrackbar('lowH', 'image', hsv['ilowH'], 179, callback)
 cv2.createTrackbar('highH', 'image', hsv['ihighH'], 179, callback)
@@ -32,12 +64,7 @@ while True:
     frame = original.copy()
 
     # get trackbars position
-    hsv['ilowH'] = cv2.getTrackbarPos('lowH', 'image')
-    hsv['ihighH'] = cv2.getTrackbarPos('highH', 'image')
-    hsv['ilowS'] = cv2.getTrackbarPos('lowS', 'image')
-    hsv['ihighS'] = cv2.getTrackbarPos('highS', 'image')
-    hsv['ilowV'] = cv2.getTrackbarPos('lowV', 'image')
-    hsv['ihighV'] = cv2.getTrackbarPos('highV', 'image')
+    get_trackbars_position()
 
     # create a mask
     hsv_colors = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -61,23 +88,7 @@ while True:
 
     im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    if contours is not None:
-        for cnt in contours:
-            if len(cnt) > 3:
-
-                rect = cv2.minAreaRect(cnt)
-                rect_area = rect[1][0]*rect[1][1]
-
-                area = cv2.contourArea(cnt)
-
-                ratio = area/rect_area
-
-                if 0.85 < ratio < 1.15 and area > 150:
-
-                    box = cv2.boxPoints(rect)
-                    box = np.int0(box)
-                    cv2.drawContours(original, [box], 0, (0, 0, 255), 2)
-
+    rectangle_recognition()
 
     cv2.imshow('mask', frame)
     cv2.imshow('original', original)
