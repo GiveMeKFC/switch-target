@@ -2,46 +2,57 @@ import cv2
 import numpy as np
 
 # Create a dictionary for the HSV default values
-hsv = {'ilowH': 0, 'ihighH': 179, 'ilowS': 0, 'ihighS': 255, 'ilowV': 0, 'ihighV': 255} #
+hsv = {'ilowH': 0, 'ihighH': 179, 'ilowS': 0, 'ihighS': 255, 'ilowV': 0, 'ihighV': 255}
 
 # put -1/0/1 in VideoCapture()
 cap = cv2.VideoCapture(1)
 cv2.namedWindow('image')
+
 
 def callback(x):
     pass
 
 
 def rectangle_recognition():
+    contours_to_check = []
 
     if contours is not None:
         for cnt in contours:
             if len(cnt) > 3:
 
                 rect = cv2.minAreaRect(cnt)
-                rect_area = rect[1][0]*rect[1][1]
+                rect_area = rect[1][0] * rect[1][1]
 
                 area = cv2.contourArea(cnt)
 
-                ratio = area/rect_area
+                ratio = area / rect_area
 
-                if 0.85 < ratio < 1.15 and area > 150:
-
+                if 0.85 < ratio < 1.15 and area > 150:  # TODO: Extract this into a function and put numbers into constants
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
                     cv2.drawContours(original, [box], 0, (0, 0, 255), 2)
+                    contours_to_check.append(cnt)
 
+    return contours_to_check
+
+
+def switch_recognition(rectangles):
+    if len(rectangles) == 2:
+
+        pass
+
+    else:
+
+        cv2.putText(original, "Searching", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
 
 def get_trackbars_position():
-
     hsv['ilowH'] = cv2.getTrackbarPos('lowH', 'image')
     hsv['ihighH'] = cv2.getTrackbarPos('highH', 'image')
     hsv['ilowS'] = cv2.getTrackbarPos('lowS', 'image')
     hsv['ihighS'] = cv2.getTrackbarPos('highS', 'image')
     hsv['ilowV'] = cv2.getTrackbarPos('lowV', 'image')
     hsv['ihighV'] = cv2.getTrackbarPos('highV', 'image')
-
 
 
 # create trackbars for color change
@@ -53,7 +64,6 @@ cv2.createTrackbar('highS', 'image', hsv['ihighS'], 255, callback)
 
 cv2.createTrackbar('lowV', 'image', hsv['ilowV'], 255, callback)
 cv2.createTrackbar('highV', 'image', hsv['ihighV'], 255, callback)
-
 
 while True:
 
@@ -88,11 +98,12 @@ while True:
 
     im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    rectangle_recognition()
+    rectangles_to_check = rectangle_recognition()
+
+    switch_recognition(rectangles_to_check)
 
     cv2.imshow('mask', frame)
     cv2.imshow('original', original)
-    counter = 0
     k = cv2.waitKey(1) & 0xFF  # large wait time to remove freezing
-    if k == 113 or k == 27:
+    if k in (27, 113):
         break
