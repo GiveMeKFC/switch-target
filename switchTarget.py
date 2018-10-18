@@ -5,7 +5,7 @@ import numpy as np
 hsv = {'ilowH': 0, 'ihighH': 179, 'ilowS': 0, 'ihighS': 255, 'ilowV': 0, 'ihighV': 255} #
 
 # put -1/0/1 in VideoCapture()
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 cv2.namedWindow('image')
 
 def callback(x):
@@ -72,7 +72,7 @@ while True:
 
                 ratio = area/rect_area
 
-                if 0.95 < ratio < 1.05:
+                if 0.9 < ratio < 1.1 and area > 50:
 
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
