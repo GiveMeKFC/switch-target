@@ -36,13 +36,16 @@ def rectangle_recognition():
     return contours_to_check
 
 
+def width_height_ratio(cnt):
+    return cnt[1][0] / cnt[1][1]
+
+
 def switch_recognition(rectangles):
     if len(rectangles) == 2:
-
+        print("1: %s", width_height_ratio(rectangles[0]))
+        print("2: %s", width_height_ratio(rectangles[1]))
         pass
-
     else:
-
         cv2.putText(original, "Searching", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
 
