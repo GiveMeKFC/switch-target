@@ -72,7 +72,7 @@ while True:
 
                 ratio = area/rect_area
 
-                if 0.9 < ratio < 1.1 and area > 50:
+                if 0.85 < ratio < 1.15 and area > 150:
 
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
